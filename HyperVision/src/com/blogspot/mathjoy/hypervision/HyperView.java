@@ -11,31 +11,49 @@ import android.view.View;
 
 public class HyperView extends View
 {
-
-	double[] angles = { 0, 0, 45, 135 };
 	Paint paint = new Paint();
 	ArrayList<Point> points = new ArrayList<Point>();
+	ArrayList<Line> lines = new ArrayList<Line>();
 
 	public HyperView(Context context, AttributeSet attrs)
 	{
 		super(context, attrs);
-		points.add(new Point(new double[] { -1, -1, -1, -1 }));
-		points.add(new Point(new double[] { -1, -1, 1, -1 }));
-		points.add(new Point(new double[] { -1, 1, -1, -1 }));
-		points.add(new Point(new double[] { -1, 1, 1, -1 }));
-		points.add(new Point(new double[] { 1, -1, -1, -1 }));
-		points.add(new Point(new double[] { 1, -1, 1, -1 }));
-		points.add(new Point(new double[] { 1, 1, -1, -1 }));
-		points.add(new Point(new double[] { 1, 1, 1, -1 }));
-
-		points.add(new Point(new double[] { -1, -1, -1, 1 }));
-		points.add(new Point(new double[] { -1, -1, 1, 1 }));
-		points.add(new Point(new double[] { -1, 1, -1, 1 }));
-		points.add(new Point(new double[] { -1, 1, 1, 1 }));
-		points.add(new Point(new double[] { 1, -1, -1, 1 }));
-		points.add(new Point(new double[] { 1, -1, 1, 1 }));
-		points.add(new Point(new double[] { 1, 1, -1, 1 }));
-		points.add(new Point(new double[] { 1, 1, 1, 1 }));
+		int dimension = 3;
+		int numPoints = (int) Math.pow(2, dimension);
+		for (int i = 0; i < numPoints; i++)
+		{
+			double[] coords = new double[dimension];
+			for (int j = 1; j <= dimension; j++)
+			{
+				if (i % Math.pow(2, j) < Math.pow(2, j - 1))
+				{
+					coords[3 - j] = -1;
+				} else
+				{
+					coords[3 - j] = 1;
+				}
+			}
+			points.add(new Point(coords));
+		}
+		for (int i = 0; i < 8; i += 2)
+		{
+			int next = i + 1;
+			if (next == 8)
+			{
+				next = 0;
+			}
+			lines.add(new Line(points.get(i), points.get(next)));
+		}
+		for (int i = 0; i < 4; i += 2)
+		{
+			int next = i + 1;
+			if (next == 4)
+			{
+				next = 0;
+			}
+			lines.add(new Line(lines.get(i).getStart(), lines.get(i).getStart()));
+			lines.add(new Line(lines.get(i).getEnd(), lines.get(i).getEnd()));
+		}
 	}
 
 	@Override
@@ -44,14 +62,35 @@ public class HyperView extends View
 		long startTime = System.currentTimeMillis();
 		super.onDraw(c);
 		drawBackground(c);
-		rotateX3D(1);
+		rotateX3D(2);
 		rotateY3D(1);
-		rotateZ3D(1);
+		//rotateZ3D(1);
 		paint.setColor(Color.RED);
 		paint.setStrokeWidth(10);
 		for (Point p : points)
 		{
 			drawPoint(c, p);
+		}
+		lines.clear();
+		for (int i = 0; i < 8; i += 2)
+		{
+			lines.add(new Line(points.get(i), points.get(i + 1)));
+		}
+		for (int i = 0; i < 8; i += 4)
+		{
+			lines.add(new Line(points.get(i), points.get(i + 2)));
+			lines.add(new Line(points.get(i + 1), points.get(i + 3)));
+		}
+		lines.add(new Line(points.get(0), points.get(4)));
+		lines.add(new Line(points.get(1), points.get(5)));
+		lines.add(new Line(points.get(2), points.get(6)));
+		lines.add(new Line(points.get(3), points.get(7)));
+
+		for (Line l : lines)
+		{
+			int size = 50;
+			int pan = 200;
+			c.drawLine((float) (pan + size * l.getStart().getCoord(0)), (float) (pan + size * l.getStart().getCoord(1)), (float) (pan + size * l.getEnd().getCoord(0)), (float) (pan + size * l.getEnd().getCoord(1)), paint);
 		}
 		long timeTook = System.currentTimeMillis() - startTime;
 		if (timeTook < 1000.0 / 60.0)
