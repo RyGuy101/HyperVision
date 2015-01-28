@@ -13,12 +13,14 @@ public class HyperView extends View
 {
 	Paint pointPaint = new Paint();
 	Paint linePaint = new Paint();
+	ArrayList<Point> originalPoints = new ArrayList<Point>();
 	ArrayList<Point> points = new ArrayList<Point>();
 	ArrayList<Line> lines = new ArrayList<Line>();
 	int dimension = 4;
 	int numPoints = (int) Math.pow(2, dimension);
 	int size = 50;
 	int pan = 200;
+	int currentAngle = 0;
 
 	public HyperView(Context context, AttributeSet attrs)
 	{
@@ -37,6 +39,21 @@ public class HyperView extends View
 				}
 			}
 			points.add(new Point(coords));
+		}
+		for (int i = 0; i < numPoints; i++)
+		{
+			double[] coords = new double[dimension];
+			for (int j = 1; j <= dimension; j++)
+			{
+				if (i % Math.pow(2, j) < Math.pow(2, j - 1))
+				{
+					coords[dimension - j] = -1;
+				} else
+				{
+					coords[dimension - j] = 1;
+				}
+			}
+			originalPoints.add(new Point(coords));
 		}
 		for (int i = 1; i <= dimension; i++)
 		{
@@ -60,10 +77,15 @@ public class HyperView extends View
 		long startTime = System.currentTimeMillis();
 		super.onDraw(c);
 		drawBackground(c);
-		rotate(new int[] { 0, 3 }, 1);
-		rotate(new int[] { 1, 3 }, 1);
-		//		rotate(new int[] { 2, 3 }, 1);
-		rotate(new int[] { 0, 1 }, 1);
+		currentAngle++;
+		if (currentAngle == 360)
+		{
+			currentAngle = 0;
+		}
+		rotate(new int[] { 0, 3 }, currentAngle);
+		rotate(new int[] { 1, 3 }, currentAngle);
+		rotate(new int[] { 2, 3 }, currentAngle);
+		rotate(new int[] { 0, 1 }, currentAngle);
 
 		for (Line l : lines)
 		{
@@ -151,9 +173,10 @@ public class HyperView extends View
 	{
 		double sin_t = Math.sin(Math.toRadians(degrees));
 		double cos_t = Math.cos(Math.toRadians(degrees));
-		for (Point point : points)
+		for (int n = 0; n < points.size(); n++)
 		{
-			double[] coords = point.getCoords();
+			Point point = points.get(n);
+			Point originalPoint = originalPoints.get(n);
 			int[] affectedAxes = new int[2];
 			int index = 0;
 			for (int i = 0; i < axes.length + 2; i++)
@@ -172,8 +195,8 @@ public class HyperView extends View
 					index++;
 				}
 			}
-			point.setCoord(affectedAxes[0], point.getCoord(affectedAxes[0]) * cos_t - point.getCoord(affectedAxes[1]) * sin_t);
-			point.setCoord(affectedAxes[1], point.getCoord(affectedAxes[1]) * cos_t + point.getCoord(affectedAxes[0]) * sin_t);
+			point.setCoord(affectedAxes[0], originalPoint.getCoord(affectedAxes[0]) * cos_t - originalPoint.getCoord(affectedAxes[1]) * sin_t);
+			point.setCoord(affectedAxes[1], originalPoint.getCoord(affectedAxes[1]) * cos_t + originalPoint.getCoord(affectedAxes[0]) * sin_t);
 		}
 	}
 }
