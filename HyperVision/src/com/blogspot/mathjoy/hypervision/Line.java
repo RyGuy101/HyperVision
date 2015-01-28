@@ -2,32 +2,22 @@ package com.blogspot.mathjoy.hypervision;
 
 public class Line
 {
-	public Point getStart()
+	public int getStartIndex()
 	{
 		return start;
 	}
 
-	public void setStart(Point start)
-	{
-		this.start = start;
-	}
-
-	public Point getEnd()
+	public int getEndIndex()
 	{
 		return end;
 	}
 
-	public void setEnd(Point end)
-	{
-		this.end = end;
-	}
+	private int start;
+	private int end;
 
-	private Point start;
-	private Point end;
-
-	public Line(Point start, Point end)
+	public Line(int startIndex, int endIndex)
 	{
-		this.start = start;
-		this.end = end;
+		this.start = startIndex;
+		this.end = endIndex;
 	}
 }

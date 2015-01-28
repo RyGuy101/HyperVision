@@ -21,6 +21,11 @@ public class Point
 		return coords[i];
 	}
 
+	public double[] getCoords()
+	{
+		return coords;
+	}
+
 	public void setCoord(int i, double coord)
 	{
 		coords[i] = coord;
