@@ -1,6 +1,8 @@
 package com.blogspot.mathjoy.hypervision;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -11,6 +13,7 @@ import android.view.View;
 
 public class HyperView extends View
 {
+	double frameRate = 60.0;
 	Paint pointPaint = new Paint();
 	Paint linePaint = new Paint();
 	ArrayList<Point> originalPoints = new ArrayList<Point>();
@@ -38,22 +41,8 @@ public class HyperView extends View
 					coords[dimension - j] = 1;
 				}
 			}
-			points.add(new Point(coords));
-		}
-		for (int i = 0; i < numPoints; i++)
-		{
-			double[] coords = new double[dimension];
-			for (int j = 1; j <= dimension; j++)
-			{
-				if (i % Math.pow(2, j) < Math.pow(2, j - 1))
-				{
-					coords[dimension - j] = -1;
-				} else
-				{
-					coords[dimension - j] = 1;
-				}
-			}
 			originalPoints.add(new Point(coords));
+			points.add(new Point(coords));
 		}
 		for (int i = 1; i <= dimension; i++)
 		{
@@ -77,15 +66,27 @@ public class HyperView extends View
 		long startTime = System.currentTimeMillis();
 		super.onDraw(c);
 		drawBackground(c);
-		currentAngle++;
+		points.clear();
+		for (Point p : originalPoints)
+		{
+			points.add(p.clone());
+		}
+		currentAngle += 1;
+
 		if (currentAngle == 360)
 		{
 			currentAngle = 0;
 		}
+		//		rotateXY(currentAngle);
+		//		rotateXW(currentAngle);
+		//		rotateYW(currentAngle);
+		//		rotateZW(currentAngle);
+		rotate(new int[] { 0, 1 }, currentAngle);
+		rotate(new int[] { 0, 2 }, currentAngle);
 		rotate(new int[] { 0, 3 }, currentAngle);
+		rotate(new int[] { 1, 2 }, currentAngle);
 		rotate(new int[] { 1, 3 }, currentAngle);
 		rotate(new int[] { 2, 3 }, currentAngle);
-		rotate(new int[] { 0, 1 }, currentAngle);
 
 		for (Line l : lines)
 		{
@@ -96,11 +97,11 @@ public class HyperView extends View
 			drawPoint(c, p);
 		}
 		long timeTook = System.currentTimeMillis() - startTime;
-		if (timeTook < 1000.0 / 60.0)
+		if (timeTook < 1000.0 / frameRate)
 		{
 			try
 			{
-				Thread.sleep((long) (1000.0 / 60.0 - timeTook));
+				Thread.sleep((long) (1000.0 / frameRate - timeTook));
 			} catch (Exception e)
 			{
 				e.printStackTrace();
@@ -134,8 +135,8 @@ public class HyperView extends View
 			Point point = points.get(n);
 			double y = point.getCoord(1);
 			double z = point.getCoord(2);
-			points.get(n).setCoord(1, y * cos_t - z * sin_t);
-			points.get(n).setCoord(2, z * cos_t + y * sin_t);
+			points.get(n).setCoord(1, y * Math.cos(Math.toRadians(theta)) - z * Math.sin(Math.toRadians(theta)));
+			points.get(n).setCoord(2, z * Math.cos(Math.toRadians(theta)) + y * Math.sin(Math.toRadians(theta)));
 		}
 	}
 
@@ -149,8 +150,8 @@ public class HyperView extends View
 			Point point = points.get(n);
 			double z = point.getCoord(2);
 			double x = point.getCoord(0);
-			points.get(n).setCoord(2, z * cos_t - x * sin_t);
-			points.get(n).setCoord(0, x * cos_t + z * sin_t);
+			point.setCoord(2, z * Math.cos(Math.toRadians(theta)) - x * Math.sin(Math.toRadians(theta)));
+			point.setCoord(0, x * Math.cos(Math.toRadians(theta)) + z * Math.sin(Math.toRadians(theta)));
 		}
 	}
 
@@ -164,8 +165,23 @@ public class HyperView extends View
 			Point point = points.get(n);
 			double x = point.getCoord(0);
 			double y = point.getCoord(1);
-			point.setCoord(0, x * cos_t - y * sin_t);
-			point.setCoord(1, y * cos_t + x * sin_t);
+			point.setCoord(0, x * Math.cos(Math.toRadians(theta)) - y * Math.sin(Math.toRadians(theta)));
+			point.setCoord(1, y * Math.cos(Math.toRadians(theta)) + x * Math.sin(Math.toRadians(theta)));
+		}
+	}
+
+	private void rotateXY(double theta)
+	{
+		double sin_t = Math.sin(Math.toRadians(theta));
+		double cos_t = Math.cos(Math.toRadians(theta));
+
+		for (int n = 0; n < points.size(); n++)
+		{
+			Point point = points.get(n);
+			double z = point.getCoord(2);
+			double w = point.getCoord(3);
+			point.setCoord(2, z * Math.cos(Math.toRadians(theta)) - w * Math.sin(Math.toRadians(theta)));
+			point.setCoord(3, w * Math.cos(Math.toRadians(theta)) + z * Math.sin(Math.toRadians(theta)));
 		}
 	}
 
@@ -176,7 +192,6 @@ public class HyperView extends View
 		for (int n = 0; n < points.size(); n++)
 		{
 			Point point = points.get(n);
-			Point originalPoint = originalPoints.get(n);
 			int[] affectedAxes = new int[2];
 			int index = 0;
 			for (int i = 0; i < axes.length + 2; i++)
@@ -195,8 +210,10 @@ public class HyperView extends View
 					index++;
 				}
 			}
-			point.setCoord(affectedAxes[0], originalPoint.getCoord(affectedAxes[0]) * cos_t - originalPoint.getCoord(affectedAxes[1]) * sin_t);
-			point.setCoord(affectedAxes[1], originalPoint.getCoord(affectedAxes[1]) * cos_t + originalPoint.getCoord(affectedAxes[0]) * sin_t);
+			double first = point.getCoord(affectedAxes[0]);
+			double second = point.getCoord(affectedAxes[1]);
+			point.setCoord(affectedAxes[0], first * cos_t - second * sin_t);
+			point.setCoord(affectedAxes[1], second * cos_t + first * sin_t);
 		}
 	}
 }

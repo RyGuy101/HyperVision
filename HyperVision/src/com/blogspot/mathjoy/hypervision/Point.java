@@ -30,4 +30,9 @@ public class Point
 	{
 		coords[i] = coord;
 	}
+
+	public Point clone()
+	{
+		return new Point(coords.clone());
+	}
 }
