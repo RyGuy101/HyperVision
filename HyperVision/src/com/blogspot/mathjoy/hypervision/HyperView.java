@@ -66,28 +66,30 @@ public class HyperView extends View
 		long startTime = System.currentTimeMillis();
 		super.onDraw(c);
 		drawBackground(c);
-		points.clear();
-		for (Point p : originalPoints)
-		{
-			points.add(p.clone());
-		}
-		currentAngle += 1;
+		//		points.clear();
+		//		for (Point p : originalPoints)
+		//		{
+		//			points.add(p.clone());
+		//		}
 
-		if (currentAngle == 360)
+		if (currentAngle < 360)
 		{
-			currentAngle = 0;
-		}
-		//		rotateXY(currentAngle);
-		//		rotateXW(currentAngle);
-		//		rotateYW(currentAngle);
-		//		rotateZW(currentAngle);
-		rotate(new int[] { 0, 1 }, currentAngle);
-		rotate(new int[] { 0, 2 }, currentAngle);
-		rotate(new int[] { 0, 3 }, currentAngle);
-		rotate(new int[] { 1, 2 }, currentAngle);
-		rotate(new int[] { 1, 3 }, currentAngle);
-		rotate(new int[] { 2, 3 }, currentAngle);
+			currentAngle += 1;
+			double numAxes = 3;
+			double totalAngle = 1;
+			double angle = totalAngle * (Math.pow(numAxes, 1 / 2.0) / (double) numAxes);
+			//			if (currentAngle == 360)
+			//			{
+			//				currentAngle = 0;
+			//			}
 
+//			rotate(new int[] { 0, 1 }, angle);
+			rotate(new int[] { 0, 2 }, angle);
+			rotate(new int[] { 0, 3 }, angle);
+//			rotate(new int[] { 1, 2 }, angle);
+//			rotate(new int[] { 1, 3 }, angle);
+			rotate(new int[] { 2, 3 }, angle);
+		}
 		for (Line l : lines)
 		{
 			drawLine(c, l);
