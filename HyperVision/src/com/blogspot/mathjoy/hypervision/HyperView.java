@@ -13,6 +13,7 @@ import android.view.View;
 
 public class HyperView extends View
 {
+	private static final double DEPTH = 1.2;
 	double frameRate = 60.0;
 	Paint pointPaint = new Paint();
 	Paint linePaint = new Paint();
@@ -58,6 +59,9 @@ public class HyperView extends View
 		pointPaint.setStrokeWidth(10);
 		linePaint.setColor(Color.GRAY);
 		linePaint.setStrokeWidth(5);
+		rotate(new int[] { 0, 3 }, 30);
+		rotate(new int[] { 1, 3 }, 30);
+		rotate(new int[] { 2, 3 }, 30);
 	}
 
 	@Override
@@ -66,30 +70,28 @@ public class HyperView extends View
 		long startTime = System.currentTimeMillis();
 		super.onDraw(c);
 		drawBackground(c);
-		//		points.clear();
-		//		for (Point p : originalPoints)
-		//		{
-		//			points.add(p.clone());
-		//		}
-
-		if (currentAngle < 360)
+		points.clear();
+		for (Point p : originalPoints)
 		{
-			currentAngle += 1;
-			double numAxes = 3;
-			double totalAngle = 1;
-			double angle = totalAngle * (Math.pow(numAxes, 1 / 2.0) / (double) numAxes);
-			//			if (currentAngle == 360)
-			//			{
-			//				currentAngle = 0;
-			//			}
-
-//			rotate(new int[] { 0, 1 }, angle);
-			rotate(new int[] { 0, 2 }, angle);
-			rotate(new int[] { 0, 3 }, angle);
-//			rotate(new int[] { 1, 2 }, angle);
-//			rotate(new int[] { 1, 3 }, angle);
-			rotate(new int[] { 2, 3 }, angle);
+			points.add(p.clone());
 		}
+
+		//			double numAxes = 2;
+		double totalAngle = 1;
+		//			double angle = totalAngle * (Math.pow(numAxes, 1 / 2.0) / (double) numAxes);
+		currentAngle += totalAngle;
+
+		if (currentAngle == 360)
+		{
+			currentAngle = 0;
+		}
+//				rotate(new int[] { 0, 1 }, currentAngle);
+		rotate(new int[] { 0, 2 }, currentAngle);
+//				rotate(new int[] { 0, 3 }, currentAngle);
+//				rotate(new int[] { 1, 2 }, currentAngle);
+		//		rotate(new int[] { 1, 3 }, currentAngle);
+		//		rotate(new int[] { 2, 3 }, currentAngle);
+
 		for (Line l : lines)
 		{
 			drawLine(c, l);
@@ -114,7 +116,10 @@ public class HyperView extends View
 
 	private void drawLine(Canvas c, Line l)
 	{
-		c.drawLine((float) (pan + size * points.get(l.getStartIndex()).getCoord(0)), (float) (pan + size * points.get(l.getStartIndex()).getCoord(1)), (float) (pan + size * points.get(l.getEndIndex()).getCoord(0)), (float) (pan + size * points.get(l.getEndIndex()).getCoord(1)), linePaint);
+		double m1 = Math.pow(DEPTH, points.get(l.getStartIndex()).getCoord(2) + points.get(l.getStartIndex()).getCoord(3));
+		double m2 = Math.pow(DEPTH, points.get(l.getEndIndex()).getCoord(2) + points.get(l.getEndIndex()).getCoord(3));
+
+		c.drawLine((float) (pan + m1 * size * points.get(l.getStartIndex()).getCoord(0)), (float) (pan + m1 * size * points.get(l.getStartIndex()).getCoord(1)), (float) (pan + m2 * size * points.get(l.getEndIndex()).getCoord(0)), (float) (pan + m2 * size * points.get(l.getEndIndex()).getCoord(1)), linePaint);
 	}
 
 	private void drawBackground(Canvas c)
@@ -124,7 +129,8 @@ public class HyperView extends View
 
 	private void drawPoint(Canvas c, Point p)
 	{
-		c.drawPoint((float) (pan + size * p.getCoord(0)), (float) (pan + size * p.getCoord(1)), pointPaint);
+		double m = Math.pow(DEPTH, p.getCoord(2) + p.getCoord(3));
+		c.drawPoint((float) (pan + m * size * p.getCoord(0)), (float) (pan + m * size * p.getCoord(1)), pointPaint);
 	}
 
 	private void rotateXW(double theta)
