@@ -9,11 +9,13 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnTouchListener;
 
-public class HyperView extends View
+public class HyperView extends View implements OnTouchListener
 {
-	private static final double DEPTH = 1.2;
+	private static final double DEPTH = 1.15;
 	double frameRate = 60.0;
 	Paint pointPaint = new Paint();
 	Paint linePaint = new Paint();
@@ -25,6 +27,7 @@ public class HyperView extends View
 	int size = 50;
 	int pan = 200;
 	int currentAngle = 0;
+	double totalAngle = 1;
 
 	public HyperView(Context context, AttributeSet attrs)
 	{
@@ -59,9 +62,9 @@ public class HyperView extends View
 		pointPaint.setStrokeWidth(10);
 		linePaint.setColor(Color.GRAY);
 		linePaint.setStrokeWidth(5);
-		rotate(new int[] { 0, 3 }, 30);
+		//		rotate(new int[] { 0, 3 }, 30);
 		rotate(new int[] { 1, 3 }, 30);
-		rotate(new int[] { 2, 3 }, 30);
+		//		rotate(new int[] { 2, 3 }, 30);
 	}
 
 	@Override
@@ -70,25 +73,28 @@ public class HyperView extends View
 		long startTime = System.currentTimeMillis();
 		super.onDraw(c);
 		drawBackground(c);
-		points.clear();
-		for (Point p : originalPoints)
-		{
-			points.add(p.clone());
-		}
 
 		//			double numAxes = 2;
-		double totalAngle = 1;
 		//			double angle = totalAngle * (Math.pow(numAxes, 1 / 2.0) / (double) numAxes);
-		currentAngle += totalAngle;
 
-		if (currentAngle == 360)
-		{
-			currentAngle = 0;
-		}
-//				rotate(new int[] { 0, 1 }, currentAngle);
-		rotate(new int[] { 0, 2 }, currentAngle);
-//				rotate(new int[] { 0, 3 }, currentAngle);
-//				rotate(new int[] { 1, 2 }, currentAngle);
+		//		if (currentAngle == 360)
+		//		{
+		//			currentAngle = 0;
+		//			points.clear();
+		//			for (Point p : originalPoints)
+		//			{
+		//				points.add(p.clone());
+		//			}
+		//			totalAngle = 0;
+		//		} else
+		//		{
+		//			currentAngle += totalAngle;
+		//		}
+
+		//				rotate(new int[] { 0, 1 }, currentAngle);
+		//		rotate(new int[] { 0, 2 }, totalAngle);
+		//				rotate(new int[] { 0, 3 }, currentAngle);
+		//				rotate(new int[] { 1, 2 }, currentAngle);
 		//		rotate(new int[] { 1, 3 }, currentAngle);
 		//		rotate(new int[] { 2, 3 }, currentAngle);
 
@@ -130,6 +136,7 @@ public class HyperView extends View
 	private void drawPoint(Canvas c, Point p)
 	{
 		double m = Math.pow(DEPTH, p.getCoord(2) + p.getCoord(3));
+		pointPaint.setStrokeWidth((float) m * 10);
 		c.drawPoint((float) (pan + m * size * p.getCoord(0)), (float) (pan + m * size * p.getCoord(1)), pointPaint);
 	}
 
@@ -223,5 +230,18 @@ public class HyperView extends View
 			point.setCoord(affectedAxes[0], first * cos_t - second * sin_t);
 			point.setCoord(affectedAxes[1], second * cos_t + first * sin_t);
 		}
+	}
+
+	@Override
+	public boolean onTouch(View v, MotionEvent event)
+	{
+		return false;
+	}
+
+	@Override
+	public boolean onTouchEvent(MotionEvent event)
+	{
+
+		return super.onTouchEvent(event);
 	}
 }
