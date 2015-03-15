@@ -16,8 +16,8 @@ import android.view.View.OnTouchListener;
 
 public class HyperView extends View implements OnTouchListener
 {
-	private static final double DEPTH_3D = 1.1;
-	private static final double DEPTH_4D = 1.5  ;
+	private static final double DEPTH_3D = 1.125;
+	private static final double DEPTH_4D = 1.5;
 	double frameRate = 60.0;
 	static Paint pointPaint = new Paint();
 	Paint linePaint = new Paint();
@@ -73,7 +73,7 @@ public class HyperView extends View implements OnTouchListener
 		linePaint.setColor(Color.GRAY);
 		linePaint.setStrokeWidth(5);
 		//		rotate(new int[] { 0, 3 }, 30);
-//		rotate(new int[] { 1, 3 }, 30);
+		//		rotate(new int[] { 1, 3 }, 30);
 		//		rotate(new int[] { 2, 3 }, 30);
 	}
 
@@ -83,8 +83,8 @@ public class HyperView extends View implements OnTouchListener
 		long startTime = System.currentTimeMillis();
 		super.onDraw(c);
 		drawBackground(c);
-		double rotateX = down * (-currentX - -prevX);
-		double rotateY = down * (-currentY - -prevY);
+		double rotateX = down * (-currentX - -prevX) * (c.getWidth() / 1440.0);
+		double rotateY = down * (-currentY - -prevY) * (c.getWidth() / 1440.0);
 		rotate(new int[] { 1, rotateDim }, rotateX);
 		rotate(new int[] { 0, rotateDim }, rotateY);
 		prevX = currentX;
