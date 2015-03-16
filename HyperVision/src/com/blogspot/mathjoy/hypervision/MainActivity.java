@@ -21,11 +21,11 @@ public class MainActivity extends Activity
 		if (HyperView.rotateDim == 3)
 		{
 			HyperView.rotateDim = 2;
-			HyperView.pointPaint.setColor(Color.GREEN);
+//			HyperView.pointPaint.setColor(Color.GREEN);
 		} else if (HyperView.rotateDim == 2)
 		{
 			HyperView.rotateDim = 3;
-			HyperView.pointPaint.setColor(Color.RED);
+//			HyperView.pointPaint.setColor(Color.RED);
 		}
 	}
 

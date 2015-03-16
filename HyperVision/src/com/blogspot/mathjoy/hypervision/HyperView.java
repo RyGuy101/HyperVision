@@ -16,11 +16,14 @@ import android.view.View.OnTouchListener;
 
 public class HyperView extends View implements OnTouchListener
 {
+	int shift = 0;
 	private static final double DEPTH_3D = 1.125;
 	private static final double DEPTH_4D = 1.5;
 	double frameRate = 60.0;
 	static Paint pointPaint = new Paint();
 	Paint linePaint = new Paint();
+	static Paint pointPaint2 = new Paint();
+	Paint linePaint2 = new Paint();
 	ArrayList<Point> originalPoints = new ArrayList<Point>();
 	ArrayList<Point> points = new ArrayList<Point>();
 	ArrayList<Point> points2 = new ArrayList<Point>();
@@ -39,6 +42,8 @@ public class HyperView extends View implements OnTouchListener
 	double currentY;
 	int down = 0;
 	public static int rotateDim = 3;
+	boolean crossEyed = true;
+	double Rotate3D = 6;
 
 	public HyperView(Context context, AttributeSet attrs)
 	{
@@ -76,12 +81,25 @@ public class HyperView extends View implements OnTouchListener
 				}
 			}
 		}
-		pointPaint.setColor(Color.RED);
-		pointPaint.setStrokeWidth(10);
-		linePaint.setColor(Color.GRAY);
-		linePaint.setStrokeWidth(5);
-		//		rotate(new int[] { 0, 3 }, 30);
-		//		rotate(new int[] { 2, 3 }, 30);
+		if (crossEyed)
+		{
+			pointPaint.setColor(Color.RED);
+			linePaint.setColor(Color.GRAY);
+			linePaint.setStrokeWidth(5);
+			pointPaint2.setColor(Color.RED);
+			linePaint2.setColor(Color.GRAY);
+			linePaint2.setStrokeWidth(5);
+			shift = 300;
+			Rotate3D = -6;
+		} else
+		{
+			pointPaint.setColor(Color.argb(255, 159, 0, 0));
+			linePaint.setColor(Color.argb(255, 159, 0, 0));
+			linePaint.setStrokeWidth(5);
+			pointPaint2.setColor(Color.argb(63, 0, 255, 255));
+			linePaint2.setColor(Color.argb(63, 0, 255, 255));
+		}
+		linePaint2.setStrokeWidth(5);
 	}
 
 	@Override
@@ -99,7 +117,7 @@ public class HyperView extends View implements OnTouchListener
 		{
 			points2.add(p.clone());
 		}
-		rotate2(new int[] { 1, 3 }, -6);
+		rotate2(new int[] { 1, 3 }, Rotate3D);
 		prevX = currentX;
 		prevY = currentY;
 		down = 1;
@@ -171,7 +189,7 @@ public class HyperView extends View implements OnTouchListener
 		double m1 = Math.pow(DEPTH_3D, points2.get(l.getStartIndex()).getCoord(2)) * Math.pow(DEPTH_4D, points2.get(l.getStartIndex()).getCoord(3));
 		double m2 = Math.pow(DEPTH_3D, points2.get(l.getEndIndex()).getCoord(2)) * Math.pow(DEPTH_4D, points2.get(l.getEndIndex()).getCoord(3));
 
-		c.drawLine((float) ((pan + m1 * size * points2.get(l.getStartIndex()).getCoord(0)) + 300), (float) (pan + m1 * size * points2.get(l.getStartIndex()).getCoord(1)), (float) ((pan + m2 * size * points2.get(l.getEndIndex()).getCoord(0)) + 300), (float) (pan + m2 * size * points2.get(l.getEndIndex()).getCoord(1)), linePaint);
+		c.drawLine((float) ((pan + m1 * size * points2.get(l.getStartIndex()).getCoord(0)) + shift), (float) (pan + m1 * size * points2.get(l.getStartIndex()).getCoord(1)), (float) ((pan + m2 * size * points2.get(l.getEndIndex()).getCoord(0)) + shift), (float) (pan + m2 * size * points2.get(l.getEndIndex()).getCoord(1)), linePaint2);
 	}
 
 	private void drawBackground(Canvas c)
@@ -189,8 +207,8 @@ public class HyperView extends View implements OnTouchListener
 	private void drawPoint2(Canvas c, Point p)
 	{
 		double m = Math.pow(DEPTH_3D, p.getCoord(2)) * Math.pow(DEPTH_4D, p.getCoord(3));
-		pointPaint.setStrokeWidth((float) ((Math.pow(DEPTH_3D, Math.pow(DEPTH_4D, p.getCoord(3)) * p.getCoord(2))) * 10));
-		c.drawPoint((float) ((pan + m * size * p.getCoord(0)) + 300), (float) (pan + m * size * p.getCoord(1)), pointPaint);
+		pointPaint2.setStrokeWidth((float) ((Math.pow(DEPTH_3D, Math.pow(DEPTH_4D, p.getCoord(3)) * p.getCoord(2))) * 10));
+		c.drawPoint((float) ((pan + m * size * p.getCoord(0)) + shift), (float) (pan + m * size * p.getCoord(1)), pointPaint2);
 	}
 
 	private void rotateXW(double theta)
@@ -326,7 +344,7 @@ public class HyperView extends View implements OnTouchListener
 	@Override
 	public boolean onTouchEvent(MotionEvent event)
 	{
-		if (event.getAction() == MotionEvent.ACTION_DOWN || event.getAction() == MotionEvent.ACTION_UP)
+		if (event.getAction() != MotionEvent.ACTION_MOVE)
 		{
 			down = 0;
 		}
