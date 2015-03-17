@@ -8,6 +8,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.text.method.Touch;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -182,6 +183,19 @@ public class HyperView extends View implements OnTouchListener
 		double m2 = Math.pow(DEPTH_3D, points.get(l.getEndIndex()).getCoord(2)) * Math.pow(DEPTH_4D, points.get(l.getEndIndex()).getCoord(3));
 
 		c.drawLine((float) (pan + m1 * size * points.get(l.getStartIndex()).getCoord(0)), (float) (pan + m1 * size * points.get(l.getStartIndex()).getCoord(1)), (float) (pan + m2 * size * points.get(l.getEndIndex()).getCoord(0)), (float) (pan + m2 * size * points.get(l.getEndIndex()).getCoord(1)), linePaint);
+		//		double width1 = (Math.pow(DEPTH_3D, Math.pow(DEPTH_4D, points.get(l.getStartIndex()).getCoord(3)) * points.get(l.getStartIndex()).getCoord(2))) * 5;
+		//		double width2 = (Math.pow(DEPTH_3D, Math.pow(DEPTH_4D, points.get(l.getEndIndex()).getCoord(3)) * points.get(l.getEndIndex()).getCoord(2))) * 5;
+		//		double x1 = pan + m1 * size * points.get(l.getStartIndex()).getCoord(0);
+		//		double y1 = pan + m1 * size * points.get(l.getStartIndex()).getCoord(1);
+		//		double x2 = pan + m2 * size * points.get(l.getEndIndex()).getCoord(0);
+		//		double y2 = pan + m2 * size * points.get(l.getEndIndex()).getCoord(1);
+		//		double theta = Math.atan((y2 - y1) / (x2 - x1));
+		//		Path path = new Path();
+		//		path.moveTo((float) (x1 + width1 * Math.sin(theta)), (float) (y1 - width1 * Math.cos(theta)));
+		//		path.lineTo((float) (x1 - width1 * Math.sin(theta)), (float) (y1 + width1 * Math.cos(theta)));
+		//		path.lineTo((float) (x2 - width2 * Math.sin(theta)), (float) (y2 + width2 * Math.cos(theta)));
+		//		path.lineTo((float) (x2 + width2 * Math.sin(theta)), (float) (y2 - width2 * Math.cos(theta)));
+		//		c.drawPath(path, linePaint);
 	}
 
 	private void drawLine2(Canvas c, Line l)
