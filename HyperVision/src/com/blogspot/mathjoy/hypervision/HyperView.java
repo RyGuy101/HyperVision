@@ -200,15 +200,17 @@ public class HyperView extends View implements OnTouchListener
 	private void drawPoint(Canvas c, Point p)
 	{
 		double m = Math.pow(DEPTH_3D, p.getCoord(2)) * Math.pow(DEPTH_4D, p.getCoord(3));
-		pointPaint.setStrokeWidth((float) ((Math.pow(DEPTH_3D, Math.pow(DEPTH_4D, p.getCoord(3)) * p.getCoord(2))) * 10));
-		c.drawPoint((float) (pan + m * size * p.getCoord(0)), (float) (pan + m * size * p.getCoord(1)), pointPaint);
+		//		pointPaint.setStrokeWidth((float) ((Math.pow(DEPTH_3D, Math.pow(DEPTH_4D, p.getCoord(3)) * p.getCoord(2))) * 10));
+		//		c.drawPoint((float) (pan + m * size * p.getCoord(0)), (float) (pan + m * size * p.getCoord(1)), pointPaint);
+		c.drawCircle((float) (pan + m * size * p.getCoord(0)), (float) (pan + m * size * p.getCoord(1)), (float) ((Math.pow(DEPTH_3D, Math.pow(DEPTH_4D, p.getCoord(3)) * p.getCoord(2))) * 5), pointPaint);
 	}
 
 	private void drawPoint2(Canvas c, Point p)
 	{
 		double m = Math.pow(DEPTH_3D, p.getCoord(2)) * Math.pow(DEPTH_4D, p.getCoord(3));
-		pointPaint2.setStrokeWidth((float) ((Math.pow(DEPTH_3D, Math.pow(DEPTH_4D, p.getCoord(3)) * p.getCoord(2))) * 10));
-		c.drawPoint((float) ((pan + m * size * p.getCoord(0)) + shift), (float) (pan + m * size * p.getCoord(1)), pointPaint2);
+		//		pointPaint2.setStrokeWidth((float) ((Math.pow(DEPTH_3D, Math.pow(DEPTH_4D, p.getCoord(3)) * p.getCoord(2))) * 10));
+		//		c.drawPoint((float) ((pan + m * size * p.getCoord(0)) + shift), (float) (pan + m * size * p.getCoord(1)), pointPaint2);
+		c.drawCircle((float) ((pan + m * size * p.getCoord(0)) + shift), (float) (pan + m * size * p.getCoord(1)), (float) ((Math.pow(DEPTH_3D, Math.pow(DEPTH_4D, p.getCoord(3)) * p.getCoord(2))) * 5), pointPaint2);
 	}
 
 	private void rotateXW(double theta)
