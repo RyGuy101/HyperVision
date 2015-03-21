@@ -31,8 +31,8 @@ public class HyperView extends View implements OnTouchListener
 	ArrayList<Line> lines = new ArrayList<Line>();
 	int dimension = 4;
 	int numPoints = (int) Math.pow(2, dimension);
-	int size = 50;
-	int pan = 200;
+	static double size = 100;
+	static double pan = size * 3;
 	int currentAngle = 0;
 	double totalAngle = 1;
 	double xChange = 0;
@@ -44,7 +44,8 @@ public class HyperView extends View implements OnTouchListener
 	int down = 0;
 	public static int rotateDim = 3;
 	boolean crossEyed = true;
-	double Rotate3D = 6;
+	double rotate3D = -6;
+	static boolean setup = true;
 
 	public HyperView(Context context, AttributeSet attrs)
 	{
@@ -90,23 +91,28 @@ public class HyperView extends View implements OnTouchListener
 			pointPaint2.setColor(Color.RED);
 			linePaint2.setColor(Color.GRAY);
 			linePaint2.setStrokeWidth(5);
-			shift = 300;
-			Rotate3D = -6;
 		} else
 		{
-			pointPaint.setColor(Color.argb(255, 159, 0, 0));
-			linePaint.setColor(Color.argb(255, 159, 0, 0));
+			pointPaint.setColor(Color.argb(63, 255, 0, 0));
+			linePaint.setColor(Color.argb(63, 255, 0, 0));
 			linePaint.setStrokeWidth(5);
 			pointPaint2.setColor(Color.argb(63, 0, 255, 255));
 			linePaint2.setColor(Color.argb(63, 0, 255, 255));
+			linePaint2.setStrokeWidth(5);
+			rotate3D = 6;
 		}
-		linePaint2.setStrokeWidth(5);
+		rotate(new int[] { 1, 3 }, -rotate3D / 2.0);
 	}
 
 	@Override
 	protected void onDraw(Canvas c)
 	{
 		long startTime = System.currentTimeMillis();
+		if (setup)
+		{
+			setup();
+			setup = false;
+		}
 		super.onDraw(c);
 		drawBackground(c);
 		double rotateX = down * (-currentX - -prevX) * (c.getWidth() / 1440.0);
@@ -118,7 +124,7 @@ public class HyperView extends View implements OnTouchListener
 		{
 			points2.add(p.clone());
 		}
-		rotate2(new int[] { 1, 3 }, Rotate3D);
+		rotate2(new int[] { 1, 3 }, rotate3D);
 		prevX = currentX;
 		prevY = currentY;
 		down = 1;
@@ -177,10 +183,16 @@ public class HyperView extends View implements OnTouchListener
 		invalidate();
 	}
 
+	private void setup()
+	{
+		size = this.getWidth() / 4.0;
+		pan = this.getWidth() / 2.0;
+	}
+
 	private void drawLine(Canvas c, Line l)
 	{
-		double m1 = Math.pow(DEPTH_3D, points.get(l.getStartIndex()).getCoord(2)) * Math.pow(DEPTH_4D, points.get(l.getStartIndex()).getCoord(3));
-		double m2 = Math.pow(DEPTH_3D, points.get(l.getEndIndex()).getCoord(2)) * Math.pow(DEPTH_4D, points.get(l.getEndIndex()).getCoord(3));
+		double m1 = Math.pow(DEPTH_3D, points.get(l.getStartIndex()).getCoord(2)) * Math.pow(DEPTH_4D, points.get(l.getStartIndex()).getCoord(3) - 1);
+		double m2 = Math.pow(DEPTH_3D, points.get(l.getEndIndex()).getCoord(2)) * Math.pow(DEPTH_4D, points.get(l.getEndIndex()).getCoord(3) - 1);
 
 		c.drawLine((float) (pan + m1 * size * points.get(l.getStartIndex()).getCoord(0)), (float) (pan + m1 * size * points.get(l.getStartIndex()).getCoord(1)), (float) (pan + m2 * size * points.get(l.getEndIndex()).getCoord(0)), (float) (pan + m2 * size * points.get(l.getEndIndex()).getCoord(1)), linePaint);
 		//		double width1 = (Math.pow(DEPTH_3D, Math.pow(DEPTH_4D, points.get(l.getStartIndex()).getCoord(3)) * points.get(l.getStartIndex()).getCoord(2))) * 5;
@@ -200,8 +212,8 @@ public class HyperView extends View implements OnTouchListener
 
 	private void drawLine2(Canvas c, Line l)
 	{
-		double m1 = Math.pow(DEPTH_3D, points2.get(l.getStartIndex()).getCoord(2)) * Math.pow(DEPTH_4D, points2.get(l.getStartIndex()).getCoord(3));
-		double m2 = Math.pow(DEPTH_3D, points2.get(l.getEndIndex()).getCoord(2)) * Math.pow(DEPTH_4D, points2.get(l.getEndIndex()).getCoord(3));
+		double m1 = Math.pow(DEPTH_3D, points2.get(l.getStartIndex()).getCoord(2)) * Math.pow(DEPTH_4D, points2.get(l.getStartIndex()).getCoord(3) - 1);
+		double m2 = Math.pow(DEPTH_3D, points2.get(l.getEndIndex()).getCoord(2)) * Math.pow(DEPTH_4D, points2.get(l.getEndIndex()).getCoord(3) - 1);
 
 		c.drawLine((float) ((pan + m1 * size * points2.get(l.getStartIndex()).getCoord(0)) + shift), (float) (pan + m1 * size * points2.get(l.getStartIndex()).getCoord(1)), (float) ((pan + m2 * size * points2.get(l.getEndIndex()).getCoord(0)) + shift), (float) (pan + m2 * size * points2.get(l.getEndIndex()).getCoord(1)), linePaint2);
 	}
@@ -213,18 +225,18 @@ public class HyperView extends View implements OnTouchListener
 
 	private void drawPoint(Canvas c, Point p)
 	{
-		double m = Math.pow(DEPTH_3D, p.getCoord(2)) * Math.pow(DEPTH_4D, p.getCoord(3));
+		double m = Math.pow(DEPTH_3D, p.getCoord(2)) * Math.pow(DEPTH_4D, p.getCoord(3) - 1);
 		//		pointPaint.setStrokeWidth((float) ((Math.pow(DEPTH_3D, Math.pow(DEPTH_4D, p.getCoord(3)) * p.getCoord(2))) * 10));
 		//		c.drawPoint((float) (pan + m * size * p.getCoord(0)), (float) (pan + m * size * p.getCoord(1)), pointPaint);
-		c.drawCircle((float) (pan + m * size * p.getCoord(0)), (float) (pan + m * size * p.getCoord(1)), (float) ((Math.pow(DEPTH_3D, Math.pow(DEPTH_4D, p.getCoord(3)) * p.getCoord(2))) * 5), pointPaint);
+		c.drawCircle((float) (pan + m * size * p.getCoord(0)), (float) (pan + m * size * p.getCoord(1)), (float) ((Math.pow(DEPTH_3D, Math.pow(DEPTH_4D, p.getCoord(3) - 1) * p.getCoord(2))) * 5), pointPaint);
 	}
 
 	private void drawPoint2(Canvas c, Point p)
 	{
-		double m = Math.pow(DEPTH_3D, p.getCoord(2)) * Math.pow(DEPTH_4D, p.getCoord(3));
+		double m = Math.pow(DEPTH_3D, p.getCoord(2)) * Math.pow(DEPTH_4D, p.getCoord(3) - 1);
 		//		pointPaint2.setStrokeWidth((float) ((Math.pow(DEPTH_3D, Math.pow(DEPTH_4D, p.getCoord(3)) * p.getCoord(2))) * 10));
 		//		c.drawPoint((float) ((pan + m * size * p.getCoord(0)) + shift), (float) (pan + m * size * p.getCoord(1)), pointPaint2);
-		c.drawCircle((float) ((pan + m * size * p.getCoord(0)) + shift), (float) (pan + m * size * p.getCoord(1)), (float) ((Math.pow(DEPTH_3D, Math.pow(DEPTH_4D, p.getCoord(3)) * p.getCoord(2))) * 5), pointPaint2);
+		c.drawCircle((float) ((pan + m * size * p.getCoord(0)) + shift), (float) (pan + m * size * p.getCoord(1)), (float) ((Math.pow(DEPTH_3D, Math.pow(DEPTH_4D, p.getCoord(3) - 1) * p.getCoord(2))) * 5), pointPaint2);
 	}
 
 	private void rotateXW(double theta)
