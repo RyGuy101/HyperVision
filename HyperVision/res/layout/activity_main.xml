@@ -5,16 +5,43 @@
     android:orientation="vertical"
     tools:context="com.blogspot.mathjoy.hypervision.MainActivity" >
 
-    <Button
-        android:id="@+id/button1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="3D/4D"
-        android:onClick="rotateDim" />
-
-    <com.blogspot.mathjoy.hypervision.HyperView
-        android:id="@+id/hyperView1"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical" >
+
+        <com.blogspot.mathjoy.hypervision.HyperView
+            android:id="@+id/hyperView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <Button
+                android:id="@+id/threeD"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="rotateDim"
+                android:text="3D" />
+
+            <Button
+                android:id="@+id/fourD"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="rotateDim"
+                android:text="4D" />
+        </LinearLayout>
+    </LinearLayout>
 
 </LinearLayout>

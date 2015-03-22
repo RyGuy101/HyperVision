@@ -9,23 +9,26 @@ import android.view.View;
 
 public class MainActivity extends Activity
 {
+	HyperView hp;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		hp = (HyperView) findViewById(R.id.hyperView);
 	}
 
 	public void rotateDim(View v)
 	{
-		if (HyperView.rotateDim == 3)
+		if (hp.rotateDim == 3)
 		{
-			HyperView.rotateDim = 2;
-//			HyperView.pointPaint.setColor(Color.GREEN);
-		} else if (HyperView.rotateDim == 2)
+			hp.rotateDim = 2;
+			//			HyperView.pointPaint.setColor(Color.GREEN);
+		} else if (hp.rotateDim == 2)
 		{
-			HyperView.rotateDim = 3;
-//			HyperView.pointPaint.setColor(Color.RED);
+			hp.rotateDim = 3;
+			//			HyperView.pointPaint.setColor(Color.RED);
 		}
 	}
 
