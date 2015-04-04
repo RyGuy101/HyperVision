@@ -45,7 +45,7 @@ public class HyperView extends View implements OnTouchListener
 	int down = 0;
 	public int rotateDim = 3;
 	boolean crossEyed = false;
-	double rotate3D = -6;
+	double rotate3D = -7;
 	boolean setup = true;
 
 	public HyperView(Context context, AttributeSet attrs)
@@ -100,7 +100,7 @@ public class HyperView extends View implements OnTouchListener
 			pointPaint2.setColor(Color.argb(63, 0, 255, 255));
 			linePaint2.setColor(Color.argb(63, 0, 255, 255));
 			linePaint2.setStrokeWidth(5);
-			rotate3D = 6;
+			rotate3D *= -1;
 		}
 		rotate(new int[] { 1, 3 }, -rotate3D / 2.0);
 	}

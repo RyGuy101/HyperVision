@@ -19,17 +19,14 @@ public class MainActivity extends Activity
 		hp = (HyperView) findViewById(R.id.hyperView);
 	}
 
-	public void rotateDim(View v)
+	public void rotate3D(View v)
 	{
-		if (hp.rotateDim == 3)
-		{
-			hp.rotateDim = 2;
-			//			HyperView.pointPaint.setColor(Color.GREEN);
-		} else if (hp.rotateDim == 2)
-		{
-			hp.rotateDim = 3;
-			//			HyperView.pointPaint.setColor(Color.RED);
-		}
+		hp.rotateDim = 3;
+	}
+
+	public void rotate4D(View v)
+	{
+		hp.rotateDim = 2;
 	}
 
 	//	@Override
