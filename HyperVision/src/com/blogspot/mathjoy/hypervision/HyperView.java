@@ -269,8 +269,8 @@ public class HyperView extends View implements OnTouchListener
 			pointPaint2.setColor(Color.RED);
 			linePaint2.setColor(Color.GRAY);
 		}
-		linePaint.setStrokeWidth(5);
-		linePaint2.setStrokeWidth(5);
+		linePaint.setStrokeWidth((float) (size / 20.0));
+		linePaint2.setStrokeWidth((float) (size / 20.0));
 
 		rotate(new int[] { 1, 3 }, -rotate3D / 2.0 - rotate3DAdjust);
 		rotate3DAdjust = -rotate3D / 2.0;
