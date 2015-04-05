@@ -1,8 +1,12 @@
 package com.blogspot.mathjoy.hypervision;
 
+import java.security.Policy.Parameters;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -44,9 +48,17 @@ public class HyperView extends View implements OnTouchListener
 	double currentY;
 	int down = 0;
 	public int rotateDim = 3;
-	boolean crossEyed = false;
-	double rotate3D = -7;
+	public static final int OFF_3D = 0;
+	public static final int RED_CYAN_3D = 1;
+	public static final int CROSS_EYE_3D = 2;
+	public static final int PARALLEL_3D = 3;
+	int stereo3D = OFF_3D;
+	double rotate3DMagnitude = 7;
+	double rotate3D;
+	double rotate3DAdjust = 0;
 	boolean setup = true;
+	DrawPoint2 drawPoint2;
+	DrawLine2 drawLine2;
 
 	public HyperView(Context context, AttributeSet attrs)
 	{
@@ -84,25 +96,6 @@ public class HyperView extends View implements OnTouchListener
 				}
 			}
 		}
-		if (crossEyed)
-		{
-			pointPaint.setColor(Color.RED);
-			linePaint.setColor(Color.GRAY);
-			linePaint.setStrokeWidth(5);
-			pointPaint2.setColor(Color.RED);
-			linePaint2.setColor(Color.GRAY);
-			linePaint2.setStrokeWidth(5);
-		} else
-		{
-			pointPaint.setColor(Color.argb(63, 255, 0, 0));
-			linePaint.setColor(Color.argb(63, 255, 0, 0));
-			linePaint.setStrokeWidth(5);
-			pointPaint2.setColor(Color.argb(63, 0, 255, 255));
-			linePaint2.setColor(Color.argb(63, 0, 255, 255));
-			linePaint2.setStrokeWidth(5);
-			rotate3D *= -1;
-		}
-		rotate(new int[] { 1, 3 }, -rotate3D / 2.0);
 	}
 
 	@Override
@@ -163,11 +156,11 @@ public class HyperView extends View implements OnTouchListener
 		}
 		for (Line l : lines)
 		{
-			drawLine2(c, l);
+			drawLine2.doo(c, l);
 		}
 		for (Point p : points2)
 		{
-			drawPoint2(c, p);
+			drawPoint2.doo(c, p);
 		}
 
 		long timeTook = System.currentTimeMillis() - startTime;
@@ -186,7 +179,18 @@ public class HyperView extends View implements OnTouchListener
 
 	private void setup()
 	{
-		if (crossEyed)
+		if (stereo3D == OFF_3D || stereo3D == RED_CYAN_3D)
+		{
+			if (this.getWidth() < this.getHeight())
+			{
+				size = this.getWidth() / 4.0;
+			} else
+			{
+				size = this.getHeight() / 4.0;
+			}
+			panX = this.getWidth() / 2.0;
+			shift = 0;
+		} else if (stereo3D == CROSS_EYE_3D || stereo3D == PARALLEL_3D)
 		{
 			if (this.getWidth() / 2.0 < this.getHeight())
 			{
@@ -198,18 +202,78 @@ public class HyperView extends View implements OnTouchListener
 				shift = this.getHeight();
 			}
 			panX = (this.getWidth() - shift) / 2.0;
-		} else
-		{
-			if (this.getWidth() < this.getHeight())
-			{
-				size = this.getWidth() / 4.0;
-			} else
-			{
-				size = this.getHeight() / 4.0;
-			}
-			panX = this.getWidth() / 2.0;
 		}
 		panY = this.getHeight() / 2.0;
+
+		if (stereo3D == CROSS_EYE_3D)
+		{
+			rotate3D = -rotate3DMagnitude;
+		} else if (stereo3D != OFF_3D)
+		{
+			rotate3D = rotate3DMagnitude;
+		} else
+		{
+			rotate3D = 0;
+		}
+		System.out.println();
+
+		if (stereo3D != OFF_3D)
+		{
+			drawPoint2 = new DrawPoint2()
+			{
+				@Override
+				public void doo(Canvas c, Point p)
+				{
+					double m = Math.pow(DEPTH_3D, p.getCoord(2)) * Math.pow(DEPTH_4D, p.getCoord(3) - 1);
+					c.drawCircle((float) ((panX + m * size * p.getCoord(0)) + shift), (float) (panY + m * size * p.getCoord(1)), (float) ((Math.pow(DEPTH_3D, Math.pow(DEPTH_4D, p.getCoord(3) - 1) * p.getCoord(2))) * 5), pointPaint2);
+				}
+			};
+			drawLine2 = new DrawLine2()
+			{
+				@Override
+				public void doo(Canvas c, Line l)
+				{
+					double m1 = Math.pow(DEPTH_3D, points2.get(l.getStartIndex()).getCoord(2)) * Math.pow(DEPTH_4D, points2.get(l.getStartIndex()).getCoord(3) - 1);
+					double m2 = Math.pow(DEPTH_3D, points2.get(l.getEndIndex()).getCoord(2)) * Math.pow(DEPTH_4D, points2.get(l.getEndIndex()).getCoord(3) - 1);
+					c.drawLine((float) ((panX + m1 * size * points2.get(l.getStartIndex()).getCoord(0)) + shift), (float) (panY + m1 * size * points2.get(l.getStartIndex()).getCoord(1)), (float) ((panX + m2 * size * points2.get(l.getEndIndex()).getCoord(0)) + shift), (float) (panY + m2 * size * points2.get(l.getEndIndex()).getCoord(1)), linePaint2);
+				}
+			};
+		} else
+		{
+			drawPoint2 = new DrawPoint2()
+			{
+				@Override
+				public void doo(Canvas c, Point p)
+				{
+				}
+			};
+			drawLine2 = new DrawLine2()
+			{
+				@Override
+				public void doo(Canvas c, Line l)
+				{
+				}
+			};
+		}
+
+		if (stereo3D == RED_CYAN_3D)
+		{
+			pointPaint.setColor(Color.argb(63, 255, 0, 0));
+			linePaint.setColor(Color.argb(63, 255, 0, 0));
+			pointPaint2.setColor(Color.argb(63, 0, 255, 255));
+			linePaint2.setColor(Color.argb(63, 0, 255, 255));
+		} else
+		{
+			pointPaint.setColor(Color.RED);
+			linePaint.setColor(Color.GRAY);
+			pointPaint2.setColor(Color.RED);
+			linePaint2.setColor(Color.GRAY);
+		}
+		linePaint.setStrokeWidth(5);
+		linePaint2.setStrokeWidth(5);
+
+		rotate(new int[] { 1, 3 }, -rotate3D / 2.0 - rotate3DAdjust);
+		rotate3DAdjust = -rotate3D / 2.0;
 	}
 
 	private void drawLine(Canvas c, Line l)
@@ -233,13 +297,13 @@ public class HyperView extends View implements OnTouchListener
 		//		c.drawPath(path, linePaint);
 	}
 
-	private void drawLine2(Canvas c, Line l)
-	{
-		double m1 = Math.pow(DEPTH_3D, points2.get(l.getStartIndex()).getCoord(2)) * Math.pow(DEPTH_4D, points2.get(l.getStartIndex()).getCoord(3) - 1);
-		double m2 = Math.pow(DEPTH_3D, points2.get(l.getEndIndex()).getCoord(2)) * Math.pow(DEPTH_4D, points2.get(l.getEndIndex()).getCoord(3) - 1);
-
-		c.drawLine((float) ((panX + m1 * size * points2.get(l.getStartIndex()).getCoord(0)) + shift), (float) (panY + m1 * size * points2.get(l.getStartIndex()).getCoord(1)), (float) ((panX + m2 * size * points2.get(l.getEndIndex()).getCoord(0)) + shift), (float) (panY + m2 * size * points2.get(l.getEndIndex()).getCoord(1)), linePaint2);
-	}
+	//	private void drawLine2(Canvas c, Line l)
+	//	{
+	//		double m1 = Math.pow(DEPTH_3D, points2.get(l.getStartIndex()).getCoord(2)) * Math.pow(DEPTH_4D, points2.get(l.getStartIndex()).getCoord(3) - 1);
+	//		double m2 = Math.pow(DEPTH_3D, points2.get(l.getEndIndex()).getCoord(2)) * Math.pow(DEPTH_4D, points2.get(l.getEndIndex()).getCoord(3) - 1);
+	//
+	//		c.drawLine((float) ((panX + m1 * size * points2.get(l.getStartIndex()).getCoord(0)) + shift), (float) (panY + m1 * size * points2.get(l.getStartIndex()).getCoord(1)), (float) ((panX + m2 * size * points2.get(l.getEndIndex()).getCoord(0)) + shift), (float) (panY + m2 * size * points2.get(l.getEndIndex()).getCoord(1)), linePaint2);
+	//	}
 
 	private void drawBackground(Canvas c)
 	{
@@ -254,13 +318,13 @@ public class HyperView extends View implements OnTouchListener
 		c.drawCircle((float) (panX + m * size * p.getCoord(0)), (float) (panY + m * size * p.getCoord(1)), (float) ((Math.pow(DEPTH_3D, Math.pow(DEPTH_4D, p.getCoord(3) - 1) * p.getCoord(2))) * 5), pointPaint);
 	}
 
-	private void drawPoint2(Canvas c, Point p)
-	{
-		double m = Math.pow(DEPTH_3D, p.getCoord(2)) * Math.pow(DEPTH_4D, p.getCoord(3) - 1);
-		//		pointPaint2.setStrokeWidth((float) ((Math.pow(DEPTH_3D, Math.pow(DEPTH_4D, p.getCoord(3)) * p.getCoord(2))) * 10));
-		//		c.drawPoint((float) ((pan + m * size * p.getCoord(0)) + shift), (float) (pan + m * size * p.getCoord(1)), pointPaint2);
-		c.drawCircle((float) ((panX + m * size * p.getCoord(0)) + shift), (float) (panY + m * size * p.getCoord(1)), (float) ((Math.pow(DEPTH_3D, Math.pow(DEPTH_4D, p.getCoord(3) - 1) * p.getCoord(2))) * 5), pointPaint2);
-	}
+	//	private void drawPoint2(Canvas c, Point p)
+	//	{
+	//		double m = Math.pow(DEPTH_3D, p.getCoord(2)) * Math.pow(DEPTH_4D, p.getCoord(3) - 1);
+	//		//		pointPaint2.setStrokeWidth((float) ((Math.pow(DEPTH_3D, Math.pow(DEPTH_4D, p.getCoord(3)) * p.getCoord(2))) * 10));
+	//		//		c.drawPoint((float) ((pan + m * size * p.getCoord(0)) + shift), (float) (pan + m * size * p.getCoord(1)), pointPaint2);
+	//		c.drawCircle((float) ((panX + m * size * p.getCoord(0)) + shift), (float) (panY + m * size * p.getCoord(1)), (float) ((Math.pow(DEPTH_3D, Math.pow(DEPTH_4D, p.getCoord(3) - 1) * p.getCoord(2))) * 5), pointPaint2);
+	//	}
 
 	private void rotateXW(double theta)
 	{
@@ -402,5 +466,15 @@ public class HyperView extends View implements OnTouchListener
 		currentX = event.getX();
 		currentY = event.getY();
 		return true;
+	}
+
+	public interface DrawPoint2
+	{
+		void doo(Canvas c, Point p);
+	}
+
+	public interface DrawLine2
+	{
+		void doo(Canvas c, Line l);
 	}
 }

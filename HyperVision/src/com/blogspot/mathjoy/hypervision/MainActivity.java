@@ -19,24 +19,72 @@ public class MainActivity extends Activity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		hp = (HyperView) findViewById(R.id.hyperView);
-		RadioGroup rotateDimRG = (RadioGroup) findViewById(R.id.rotateDimRG);
+		final RadioGroup rotateDimRG = (RadioGroup) findViewById(R.id.rotateDimRG);
 		rotateDimRG.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener()
 		{
 			@Override
 			public void onCheckedChanged(RadioGroup group, int checkedId)
 			{
+				((RadioButton) findViewById(checkedId)).setBackgroundResource(R.drawable.light_gray);
+				for (int i = 0; i < rotateDimRG.getChildCount(); i++)
+				{
+					try
+					{
+						RadioButton temp = (RadioButton) rotateDimRG.getChildAt(i);
+						if (rotateDimRG.getChildAt(i).getId() != checkedId)
+						{
+							rotateDimRG.getChildAt(i).setBackgroundResource(R.drawable.transparent);
+						}
+					} catch (Exception e)
+					{
+					}
+				}
 				if (checkedId == R.id.rotate3D)
 				{
 					hp.rotateDim = 3;
-					((RadioButton) findViewById(R.id.rotate3D)).setBackgroundResource(R.drawable.light_gray);
-					((RadioButton) findViewById(R.id.rotate4D)).setBackgroundResource(R.drawable.transparent);
-
 				} else if (checkedId == R.id.rotate4D)
 				{
 					hp.rotateDim = 2;
-					((RadioButton) findViewById(R.id.rotate4D)).setBackgroundResource(R.drawable.light_gray);
-					((RadioButton) findViewById(R.id.rotate3D)).setBackgroundResource(R.drawable.transparent);
+				}
+			}
+		});
 
+		final RadioGroup stereo = (RadioGroup) findViewById(R.id.stereoRG);
+		stereo.setClickable(true);
+		stereo.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener()
+		{
+			@Override
+			public void onCheckedChanged(RadioGroup group, int checkedId)
+			{
+				((RadioButton) findViewById(checkedId)).setBackgroundResource(R.drawable.light_gray);
+				for (int i = 0; i < stereo.getChildCount(); i++)
+				{
+					try
+					{
+						if (stereo.getChildAt(i).getId() != checkedId)
+						{
+							stereo.getChildAt(i).setBackgroundResource(R.drawable.transparent);
+						}
+					} catch (Exception e)
+					{
+					}
+				}
+				if (checkedId == R.id.off3D)
+				{
+					hp.stereo3D = HyperView.OFF_3D;
+					hp.setup = true;
+				} else if (checkedId == R.id.redCyan)
+				{
+					hp.stereo3D = HyperView.RED_CYAN_3D;
+					hp.setup = true;
+				} else if (checkedId == R.id.crossEye)
+				{
+					hp.stereo3D = HyperView.CROSS_EYE_3D;
+					hp.setup = true;
+				} else if (checkedId == R.id.parallel)
+				{
+					hp.stereo3D = HyperView.PARALLEL_3D;
+					hp.setup = true;
 				}
 			}
 		});
