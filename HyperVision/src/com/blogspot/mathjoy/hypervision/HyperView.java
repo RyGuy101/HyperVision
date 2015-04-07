@@ -58,7 +58,7 @@ public class HyperView extends View implements OnTouchListener
 	int stereo3D = OFF_3D;
 	double rotate3DMagnitude = 7;
 	double rotate3D;
-	double rotate3DAdjust = 0;
+	static double rotate3DAdjust = 0;
 	boolean setup = true;
 	DrawPoint2 drawPoint2;
 	DrawLine2 drawLine2;
@@ -422,7 +422,7 @@ public class HyperView extends View implements OnTouchListener
 		}
 	}
 
-	private void rotate(int[] axes, double degrees)
+	public void rotate(int[] axes, double degrees)
 	{
 		double sin_t = Math.sin(Math.toRadians(degrees));
 		double cos_t = Math.cos(Math.toRadians(degrees));

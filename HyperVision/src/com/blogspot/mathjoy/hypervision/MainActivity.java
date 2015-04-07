@@ -137,6 +137,8 @@ public class MainActivity extends Activity
 				{
 					hp.rotate3D = 0;
 				}
+				hp.rotate(new int[] { 1, 3 }, -hp.rotate3D / 2.0 - HyperView.rotate3DAdjust);
+				HyperView.rotate3DAdjust = -hp.rotate3D / 2.0;
 			}
 		});
 		final View rdLayout1 = findViewById(R.id.rdLayout1);
@@ -229,7 +231,7 @@ public class MainActivity extends Activity
 		((SeekBar) findViewById(R.id.proj4D)).setProgress(500);
 		((SeekBar) findViewById(R.id.angle3D)).setProgress(70);
 		rotateDimChanged((RadioGroup) findViewById(R.id.rotateDimRG), R.id.rotate3D);
-		hp.rotate3DAdjust = 0;
+		HyperView.rotate3DAdjust = 0;
 		hp.initialSetup();
 		hp.setup = true;
 		return true;
