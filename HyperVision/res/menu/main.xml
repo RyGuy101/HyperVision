@@ -4,9 +4,8 @@
     tools:context="com.blogspot.mathjoy.hypervision.MainActivity" >
 
     <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:title="@string/action_settings"
+        android:id="@+id/reset"
+        android:title="Reset"
         app:showAsAction="never"/>
 
 </menu>
