@@ -52,10 +52,12 @@ public class MainActivity extends Activity
 					{
 					}
 				}
+				((SeekBar) findViewById(R.id.angle3D)).setClickable(true); //TODO Make this work like it should.
 				if (checkedId == R.id.off3D)
 				{
 					hp.stereo3D = HyperView.OFF_3D;
 					hp.setup = true;
+					((SeekBar) findViewById(R.id.angle3D)).setClickable(false); //TODO Make this work like it should.
 				} else if (checkedId == R.id.redCyan)
 				{
 					hp.stereo3D = HyperView.RED_CYAN_3D;

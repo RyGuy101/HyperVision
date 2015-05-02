@@ -112,6 +112,10 @@ public class HyperView extends View implements OnTouchListener
 	@Override
 	protected void onDraw(Canvas c)
 	{
+		if (MainActivity.activity.getResources().getBoolean(R.bool.isTablet))
+		{
+			pointPaint.setColor(Color.GREEN);
+		}
 		long startTime = System.currentTimeMillis();
 		if (setup)
 		{
@@ -299,6 +303,7 @@ public class HyperView extends View implements OnTouchListener
 		}
 		linePaint.setStrokeWidth((float) (size / 20.0));
 		linePaint2.setStrokeWidth((float) (size / 20.0));
+		pointThickness = (int) (size / 20.0);
 
 		rotate(new int[] { 1, 3 }, -rotate3D / 2.0 - rotate3DAdjust);
 		rotate3DAdjust = -rotate3D / 2.0;
